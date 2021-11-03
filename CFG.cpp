@@ -58,15 +58,28 @@ void CFG::print() {
     for (const auto& element: this->productions) {
         // Printing all replacements
         cout << "    " << element.first << " -> `";
+        /*
         for (const auto& replacement: element.second) {
             cout << replacement;
-            if (replacement != element.second.back()) cout << " "; // Add the comma except at the end
-            else cout << "`" << endl; // Add the end of the vector to the end
+            if (replacement != element.second.back()) {
+                cout << " ";
+            } // Add the comma except at the end
+            else {
+                cout << "`" << endl; // Add the end of the vector to the end
+            }
+        }
+        */
+        bool other = false;
+        for (auto it = element.second.begin(); it != element.second.end(); it++) {
+            cout << (*it);
+            if (next(it) != element.second.end()) {
+                cout << " ";
+            } else cout << "`" << endl;
         }
     } cout << "}" << endl;
 
     // Printing start
-    cout << "S = " << this->start;
+    cout << "S = " << this->start << endl; // TODO maybe remove endl
 }
 
 void CFG::parser(const json& j) {

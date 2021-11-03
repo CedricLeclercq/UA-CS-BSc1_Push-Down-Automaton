@@ -17,7 +17,7 @@ class CFG {
 protected:
 
     // Member variables
-    std::vector<std::string> variables;
+    std::vector<std::string> variables; // TODO fix "problem" where here [...] can be given as well when someone wants to do CFG->PDA
     std::vector<std::string> terminals;
     std::vector<std::pair<std::string, std::vector<std::string>>> productions;
     std::string start;
