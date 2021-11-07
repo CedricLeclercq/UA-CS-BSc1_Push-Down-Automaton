@@ -102,4 +102,105 @@ void CFG::parser(const json& j) {
     this->start = startChar;
 }
 
+void CFG::createTable(const string& str) {
+    this->table.clear(); // Clearing past entries
+    this->table.reserve((int)str.size());
+    for (int i = 0; i < (int)str.size(); i++) {
+        vector<vector<string>> cur; // Current vector to be pushed
+        cur.reserve((int)str.size()); // Reserving size
+        for (int j = 0; j < (int)str.size(); j++) {
+            vector<string> cur2;
+            cur.emplace_back(cur2);
+        }
+        table.push_back(cur);
+    }
+}
+
+bool CFG::accepts(const string& str) {
+    // First creating CYK table
+    this->createTable(str);
+    // Now setting up the algorithm
+    vector<pair<string,vector<string>>> allResults;
+
+    for (int i = 1; i <= (int)str.size(); i++) {
+        vector<string> test = CFG::splitInPieces(str,i);
+        for (int j = 0; j < (int)test.size(); j++) {
+            string toTest = test[j]; // what we should use for calculating
+
+            // base case, we are on the first row
+            if (i == 1) {
+                this->table[i-1][j] = this->findCharInProd(toTest);
+                allResults.emplace_back(toTest,this->table[i-1][j]);
+            }
+
+            // Normal case (where we are NOT at the first row)
+            else {
+                // First calculating cartesian product of what we need
+                vector<vector<string>> allComb;
+                for (auto ch: toTest) {
+                    allComb.push_back(this->findCharInProd(string(1,ch)));
+                }
+                cartesianProduct(allComb);
+                // TODO do operation on allComb and set in a new vector with cartesian products
+            }
+        }
+    }
+    this->printTable();
+    return false;
+}
+
+vector<string> CFG::splitInPieces(const string& str, int amount) {
+    vector<string> ret;
+    ret.reserve((int)str.size());
+    for (int i = 0; i < (int)str.size(); i++) {
+        if (amount <= (int)str.size()) {
+            string result = str.substr(i, amount);
+            if (result.size() < amount)
+                continue;
+            else ret.push_back(result);
+        }
+    }
+    return ret;
+}
+
+void CFG::printTable() {
+    for (int i = (int)this->table.size() - 1; i >= 0; i--) {
+        cout << "|";
+        for (auto & j : this->table[i]) { // Or j == size() see for later
+            string s = " {";
+            for (auto it = j.begin(); it != j.end(); it++) {
+                s += (*it);
+                if (next(it) != j.end()) {
+                    s += ", ";
+                } else cout << s + "}  |";
+            }
+        } cout << endl;
+    }
+}
+
+std::vector<std::string> CFG::findCharInProd(const std::string& ch) {
+    vector<string> result;
+    for (const auto& prod: this->productions) {
+        for (const auto& rep: prod.second) {
+            if (rep == ch) {
+                result.push_back(prod.first);
+            }
+        }
+    }
+    return result;
+}
+
+std::vector<std::vector<std::string>> CFG::cartesianProduct(std::vector<std::vector<std::string>> v) {
+    vector<vector<string>> fullResult;
+    for (const auto& item: v[0]) {
+        for (const auto& item2: v[1]) {
+            vector<string> result = {item,item2};
+            fullResult.push_back(result);
+        }
+    }
+    return {};
+}
+
+
+
 

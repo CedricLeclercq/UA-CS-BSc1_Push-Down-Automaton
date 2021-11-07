@@ -20,6 +20,7 @@ protected:
     std::vector<std::string> variables; // TODO fix "problem" where here [...] can be given as well when someone wants to do CFG->PDA
     std::vector<std::string> terminals;
     std::vector<std::pair<std::string, std::vector<std::string>>> productions;
+    std::vector<std::vector<std::vector<std::string>>> table;
     std::string start;
 
     // Member functions
@@ -46,8 +47,15 @@ public:
        this->productions = newProductions;
        this->start = newStart;
     }
+
     void print();
     void parser(const json& j);
+    bool accepts(const std::string& str);
+    void createTable(const std::string& str);
+    static std::vector<std::string> splitInPieces(const std::string& str, int amount);
+    void printTable();
+    std::vector<std::string> findCharInProd(const std::string& ch);
+    std::vector<std::vector<std::string>> cartesianProduct(std::vector<std::vector<std::string>> v);
 };
 
 

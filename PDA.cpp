@@ -86,6 +86,7 @@ CFG *PDA::toCFG() {
         // Fixing other productions
     }
 
+    /*
     for (auto tr: this->allTransitions) {
         vector<string> var = {tr->getFrom()->getName(),tr->getStackTop(),tr->getTo()->getName()}; // variable
         vector<string> rep = {tr->getInput()};// replacement
@@ -93,14 +94,51 @@ CFG *PDA::toCFG() {
         if (trRep.empty())
             continue;
         string lsName = tr->getTo()->getName(); // last used state's name
-        for (int i = 0; i < trRep.size() and i < this->states.size(); i++) {
-            if (trRep[i] == trRep.back()) {
+        for (auto it = trRep.begin(); it != trRep.end(); it++) {
+            if (next(it) == trRep.end()) {
                 string item = Utils::vectorToBracketsString(
-                        {this->states[0]->getName(), tr->getStackTop(), tr->getTo()->getName()});
+                        {tr->getTo()->getName(), (*it), tr->getTo()->getName()});
                 rep.push_back(item);
+            } else {
+
             }
         }
+        for (int i = 0; i < trRep.size() and i < this->states.size(); i++) {
+            //if (trRep[i] == trRep.back()) {
+            //    string item = Utils::vectorToBracketsString(
+            //            {tr->getTo()->getName(), trRep[i], tr->getTo()->getName()});
+            //    rep.push_back(item);
+            //}
+        }
         productions.emplace_back(Utils::vectorToBracketsString(var),rep);
+    }
+    */
+
+    /*
+     * Maak vector zonder de state zelf, om daarna te itereren over alle resterende states. Zet in die vector
+     * die state als laatste er dan in zodat die de laatste replacement nog steeds is.
+     * TODO probleem oplossen waarbij er te veel 0'en en 1'en gemaakt worden
+     */
+    // Looping over all transitions
+    for (auto tr: this->allTransitions) {
+        State * prev = tr->getTo(); // Previously used state, needed for the algorithm (see later)
+        if (not tr->getReplacement().empty()) {
+            for (auto state: this->states) { // We need to iterate over all the (q,x,**STATES**) and create all the productions
+                vector<string> var;
+                if (state == this->states.front()) {
+                    var = {tr->getFrom()->getName(), tr->getStackTop(), tr->getTo()->getName()}; // variable
+                    prev = tr->getTo();
+                } else {
+                    var = {prev->getName(), tr->getStackTop(), state->getName()}; // variable
+                    prev = state;
+                }
+                // everything after the var -> ... . Starts with its input symbol (as it should)
+                vector<string> pro = {tr->getInput()};
+                productions.emplace_back(Utils::vectorToBracketsString(var), pro);
+            }
+        } else {
+            cerr << "here" << endl;
+        }
     }
 
 

@@ -40,6 +40,7 @@ public:
     }
     State * findState(const std::string& name);
     CFG * toCFG();
+
 };
 
 
