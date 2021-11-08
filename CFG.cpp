@@ -243,6 +243,16 @@ vector<string> CFG::splitInPieces(const string& str, int amount) {
 }
 
 void CFG::printTable() {
+    // First finding the longest element for printing the spaces before the |
+    int max = 0;
+    for (const auto& row: this->table) {
+        for (const auto& elem: row) {
+            if ((int)elem.size() > max) {
+                max = (int)elem.size();
+            }
+        }
+    }
+    // Per element in de vector dat een vector minder heeft moet het twee spaties extra toevoegen
     for (int i = (int)this->table.size() - 1; i >= 0; i--) {
         cout << "|";
         int k = 0;
@@ -253,10 +263,29 @@ void CFG::printTable() {
                 s+= (*it);
                 if (next(it) != (*it2).end()) {
                     s += ", ";
-                } else cout << s + "}  |";
+                } else {
+                    string spaces;
+                    for (int j = 0; j < max - (*it2).size(); j++) {
+                        spaces += "   ";
+                    } if (!(*it2).empty() and max != (*it2).size()) {
+                        spaces += "  ";
+                    }
+                    if (max == (*it2).size())
+                        spaces += "  ";
+                    cout << s + "}" << spaces << "|";
+                }
             }
-            if (k < this->table.size() - i and (*it2).empty())
-                cout << s << "}  |";
+            if (k < this->table.size() - i and (*it2).empty()) {
+                string spaces;
+                for (int j = 0; j < max - (*it2).size(); j++) {
+                    spaces += "   ";
+                } if (!(*it2).empty() and max != (*it2).size()) {
+                    spaces += "  ";
+                }
+                if (max == (*it2).size())
+                    spaces += "  ";
+                cout << s << "}" << spaces << "|";
+            }
 
         } cout << endl;
         /*
