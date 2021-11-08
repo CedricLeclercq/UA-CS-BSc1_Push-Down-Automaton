@@ -21,5 +21,6 @@ int main() {
     //auto * dd = pda.toCFG();
     //dd->print();
     cfg.accepts("baaba");
+    cfg.accepts("abba");
     return 0;
 }

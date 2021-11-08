@@ -127,10 +127,6 @@ bool CFG::accepts(const string& str) {
         for (int j = 0; j < (int)test.size(); j++) {
             string toTest = test[j]; // what we should use for calculating
 
-            if (i == 3 and j == 0) {
-                cout << "";
-            }
-
             // base case, we are on the first row
             if (i == 1) {
                 this->table[i-1][j] = this->findCharInProd(toTest);
@@ -139,16 +135,13 @@ bool CFG::accepts(const string& str) {
 
             // Normal case (where we are NOT at the first row)
             else if (toTest.size() == 2){
-                // TODO if the input is longer than 2 we should divide the input into the prev. findings - FIRST SEE IF THIS IS REALLY NEEDED
                 // First calculating cartesian product of what we need
-                vector<vector<string>> allComb; // TODO check if this is even correct
+                vector<vector<string>> allComb;
                 for (auto ch: toTest) {
                     allComb.push_back(this->findCharInProd(string(1,ch)));
                 }
 
-                // We assume that cartProd is the correct cartProduct we need
                 vector<vector<string>> cartProd = cartesianProduct(allComb);
-                // Assuming everything is parsed perfectly before here // TODO
                 vector<string> matches;
                 for (const auto& item: cartProd) {
                     string str1;
@@ -177,7 +170,6 @@ bool CFG::accepts(const string& str) {
                 for (int it = 1; it < toTest.size(); it++) {
                     string sub1 = toTest.substr(0,it);
                     string sub2 = toTest.substr(it,string::npos);
-                    cout << toTest << " " << sub1  << " " << sub2 << endl; // TODO remove debug code
 
 
                     // The input is now split, we can search for its substrings in our allResults vector
@@ -225,7 +217,8 @@ bool CFG::accepts(const string& str) {
         }
     }
     this->printTable();
-    return false;
+    cout << boolalpha << this->evaluateAcceptanceTable() << endl; // So that ING is happy
+    return this->evaluateAcceptanceTable();
 }
 
 vector<string> CFG::splitInPieces(const string& str, int amount) {
@@ -263,6 +256,18 @@ void CFG::printTable() {
         int k = 0;
         int max = 3;
         int iterator = 0;
+        bool empty = true;
+        for (auto item: this->table[i]) {
+            if (!item.empty())
+                empty = false;
+        }
+        if (empty) {
+            string spaces;
+            for (int j = 0; j < sizes[iterator]; j++) {
+                spaces += "   ";
+            }
+            cout << " " << "{}" << spaces << "|";
+        }
         for (auto it2 = this->table[i].begin(); it2 != this->table[i].end(); it2++) {
             k++;
             string s = " {";
@@ -295,7 +300,8 @@ void CFG::printTable() {
             }
             iterator++;
 
-        } cout << endl;
+        }
+        cout << endl;
         /*
         for (auto & j : this->table[i]) { // Or j == size() see for later
             string s = " {";
@@ -333,6 +339,22 @@ std::vector<std::vector<std::string>> CFG::cartesianProduct(std::vector<std::vec
         }
     }
     return fullResult;
+}
+
+bool CFG::evaluateAcceptanceTable() {
+    if (table.empty())
+        return false;
+    for (auto it = this->table.begin(); it != this->table.end(); it++) {
+        if (next(it) == this->table.end()) {
+            for (const auto& elem: (*it)) {
+                for (const auto& ch: elem) {
+                    if (ch == "S")
+                        return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 

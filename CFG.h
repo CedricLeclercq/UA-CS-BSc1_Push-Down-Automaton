@@ -56,6 +56,7 @@ public:
     void printTable();
     std::vector<std::string> findCharInProd(const std::string& ch);
     std::vector<std::vector<std::string>> cartesianProduct(std::vector<std::vector<std::string>> v);
+    bool evaluateAcceptanceTable();
 };
 
 
