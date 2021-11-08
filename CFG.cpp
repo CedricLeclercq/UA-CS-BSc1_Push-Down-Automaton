@@ -135,13 +135,35 @@ bool CFG::accepts(const string& str) {
 
             // Normal case (where we are NOT at the first row)
             else {
+                // TODO if the input is longer than 2 we should divide the input into the prev. findings - FIRST SEE IF THIS IS REALLY NEEDED
                 // First calculating cartesian product of what we need
-                vector<vector<string>> allComb;
+                vector<vector<string>> allComb; // TODO check if this is even correct
                 for (auto ch: toTest) {
                     allComb.push_back(this->findCharInProd(string(1,ch)));
                 }
-                cartesianProduct(allComb);
-                // TODO do operation on allComb and set in a new vector with cartesian products
+
+                // We assume that cartProd is the correct cartProduct we need
+                vector<vector<string>> cartProd = cartesianProduct(allComb);
+                // Assuming everything is parsed perfectly before here // TODO
+                vector<string> matches;
+                for (const auto& item: cartProd) {
+                    string str1;
+                    for (const auto& item1: item)
+                        str1 += item1;
+                    for (const auto& prod: this->productions) {
+                        string str2;
+                        for (const auto& item2: prod.second) {
+                            str2 += item2;
+                        }
+                        if (str1 == str2) {
+                            matches.emplace_back(prod.first);
+                        }
+                    }
+                }
+
+                // We found all the matches, we can store it into the table
+                this->table[i-1][j] = matches;
+                this->printTable();
             }
         }
     }
@@ -198,7 +220,7 @@ std::vector<std::vector<std::string>> CFG::cartesianProduct(std::vector<std::vec
             fullResult.push_back(result);
         }
     }
-    return {};
+    return fullResult;
 }
 
 
