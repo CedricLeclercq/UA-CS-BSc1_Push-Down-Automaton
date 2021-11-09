@@ -39,7 +39,7 @@ public:
         this->parser(j);
     }
     State * findState(const std::string& name);
-    CFG * toCFG();
+    CFG toCFG();
 
 };
 

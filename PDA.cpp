@@ -72,7 +72,7 @@ State * PDA::findState(const string &name) {
     return nullptr;
 }
 
-CFG *PDA::toCFG() {
+CFG PDA::toCFG() {
     // Finding all the variables
     vector<vector<string>> variablesVector{};
     for (auto state: this->states) {
@@ -115,13 +115,13 @@ CFG *PDA::toCFG() {
             } else {
                 //productions.emplace_back(Utils::vectorToBracketsString(var), pro);
                 int initialStateSelect = 0;
-                State * prev = tr->getTo();
                 for (auto itB = 0; itB < tr->getReplacement().size(); itB++) {
                     if (initialStateSelect >= this->states.size()) {
                         initialStateSelect = 0;
                     }
                     int stateSelect = initialStateSelect;
                     pro = {tr->getInput()};
+                    State * prev = tr->getTo();
                     for (auto itA = 0; itA < tr->getReplacement().size(); itA++) {
                         // Doing this for selecting states, but preventing selecting states that don't exist
                         if (stateSelect >= this->states.size())
@@ -211,7 +211,8 @@ CFG *PDA::toCFG() {
     for (const auto& item: variablesVector)
         variables.push_back(Utils::vectorToBracketsString(item));
 
-    auto * cfg = new CFG(variables,terminals,productions,"S");
+    //auto * cfg = new CFG(variables,terminals,productions,"S");
+    CFG cfg(variables,terminals,productions,"S");
     return cfg;
 }
 

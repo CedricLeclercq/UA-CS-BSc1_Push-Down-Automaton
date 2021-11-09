@@ -18,8 +18,8 @@ int main() {
     //cfg.print();
     PDA pda("/Users/cedricleclercq/Documents/1 School/2BINF/Machines en berkenbaarheid/projects/Push-Down-Automaton/PDA2.json");
     pda.findState("q");
-    auto * dd = pda.toCFG();
-    dd->print();
+    auto dd = pda.toCFG();
+    dd.print();
     //cfg.accepts("aaabb");
     //cfg.accepts("aaabbb");
     return 0;
