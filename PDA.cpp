@@ -8,6 +8,19 @@
 using namespace std;
 using json = nlohmann::json;
 
+bool comparePairWords2(const pair<string,vector<string>>& a, const pair<string,vector<string>>& b) {
+    if (a.first == b.first) {
+        string one;
+        for (const auto& elem: a.second)
+            one += elem;
+        string two;
+        for (const auto& elem: b.second)
+            two += elem;
+        return one < two;
+    }
+    return a.first < b.first;
+}
+
 void PDA::parser(const json &j) {
     // Setting new Alphabets
     vector<string> nAlphabet = j["Alphabet"];
@@ -85,41 +98,69 @@ CFG *PDA::toCFG() {
         }
         // Fixing other productions
     }
-
-    /*
+    // Looping over all transitions
     for (auto tr: this->allTransitions) {
-        vector<string> var = {tr->getFrom()->getName(),tr->getStackTop(),tr->getTo()->getName()}; // variable
-        vector<string> rep = {tr->getInput()};// replacement
-        vector<string> trRep = tr->getReplacement(); // transition replacements
-        if (trRep.empty())
-            continue;
-        string lsName = tr->getTo()->getName(); // last used state's name
-        for (auto it = trRep.begin(); it != trRep.end(); it++) {
-            if (next(it) == trRep.end()) {
-                string item = Utils::vectorToBracketsString(
-                        {tr->getTo()->getName(), (*it), tr->getTo()->getName()});
-                rep.push_back(item);
+        for (auto state: this->states) {
+            vector<string> var = {tr->getFrom()->getName(), tr->getStackTop(), state->getName()};
+            // The vector pro will be used for everything after the -> ...
+            vector<string> pro;
+            // No replacements, we have epsilon
+            if (tr->getReplacement().empty() and state == tr->getTo()) {
+                pro = {tr->getInput()};
+                if (find(productions.begin(),productions.end(),
+                         make_pair(Utils::vectorToBracketsString(var),pro)) == productions.end()) {
+                    productions.emplace_back(Utils::vectorToBracketsString(var),pro);
+                }
+                break;
             } else {
+                //productions.emplace_back(Utils::vectorToBracketsString(var), pro);
+                int initialStateSelect = 0;
+                State * prev = tr->getTo();
+                for (auto itB = 0; itB < tr->getReplacement().size(); itB++) {
+                    if (initialStateSelect >= this->states.size()) {
+                        initialStateSelect = 0;
+                    }
+                    int stateSelect = initialStateSelect;
+                    pro = {tr->getInput()};
+                    for (auto itA = 0; itA < tr->getReplacement().size(); itA++) {
+                        // Doing this for selecting states, but preventing selecting states that don't exist
+                        if (stateSelect >= this->states.size())
+                            stateSelect = 0;
+                        vector<string> proElem;
+                        if (itA + 1 == tr->getReplacement().size())
+                            proElem = {prev->getName(), tr->getReplacement()[itA], state->getName()};
+                        else proElem = {prev->getName(), tr->getReplacement()[itA], this->states[stateSelect]->getName()};
+                        prev = this->states[stateSelect];
+                        pro.emplace_back(Utils::vectorToBracketsString(proElem));
+                        stateSelect++;
+                    }
+                    initialStateSelect++;
+                    productions.emplace_back(Utils::vectorToBracketsString(var), pro);
+                }
 
+                /*
+                for (auto toGo: this->states) {
+                    pro = {tr->getInput()};
+                    for (auto rep: tr->getReplacement()) {
+                        vector<string> proElem = {tr->getTo()->getName(),tr->getStackTop(),toGo->getName()};
+                        pro.emplace_back(Utils::vectorToBracketsString(proElem));
+                    }
+                    productions.emplace_back(Utils::vectorToBracketsString(var),pro);
+                }
+                // Now making the more fancy productions
+                 */
+                /*
+                 * At this point, we have our var, so the first part of the -> ...
+                 * We only need to calc the second part
+                 */
+
+                // TODO productions.emplace_back(...)
             }
         }
-        for (int i = 0; i < trRep.size() and i < this->states.size(); i++) {
-            //if (trRep[i] == trRep.back()) {
-            //    string item = Utils::vectorToBracketsString(
-            //            {tr->getTo()->getName(), trRep[i], tr->getTo()->getName()});
-            //    rep.push_back(item);
-            //}
-        }
-        productions.emplace_back(Utils::vectorToBracketsString(var),rep);
     }
-    */
+    sort(productions.begin(),productions.end(), comparePairWords2); // TODO change that the empty string is last
 
     /*
-     * Maak vector zonder de state zelf, om daarna te itereren over alle resterende states. Zet in die vector
-     * die state als laatste er dan in zodat die de laatste replacement nog steeds is.
-     * TODO probleem oplossen waarbij er te veel 0'en en 1'en gemaakt worden
-     */
-    // Looping over all transitions
     for (auto tr: this->allTransitions) {
         State * prev = tr->getTo(); // Previously used state, needed for the algorithm (see later)
         if (not tr->getReplacement().empty()) {
@@ -140,7 +181,7 @@ CFG *PDA::toCFG() {
             cerr << "here" << endl;
         }
     }
-
+    */
 
     /*
     for (auto transition: this->allTransitions) {

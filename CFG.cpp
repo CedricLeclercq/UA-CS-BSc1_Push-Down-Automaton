@@ -140,7 +140,7 @@ bool CFG::accepts(const string& str) {
                 for (auto ch: toTest) {
                     allComb.push_back(this->findCharInProd(string(1,ch)));
                 }
-
+                // TODO fix not so clean code
                 vector<vector<string>> cartProd = cartesianProduct(allComb);
                 vector<string> matches;
                 for (const auto& item: cartProd) {
@@ -251,7 +251,10 @@ void CFG::printTable() {
         }
     }
     // Per element in de vector dat een vector minder heeft moet het twee spaties extra toevoegen
+    int elem1 = 0;
     for (int i = (int)this->table.size() - 1; i >= 0; i--) {
+        elem1++;
+        int currentElem = 0;
         cout << "|";
         int k = 0;
         int max = 3;
@@ -267,6 +270,7 @@ void CFG::printTable() {
                 spaces += "   ";
             }
             cout << " " << "{}" << spaces << "|";
+            currentElem++;
         }
         for (auto it2 = this->table[i].begin(); it2 != this->table[i].end(); it2++) {
             k++;
@@ -285,9 +289,10 @@ void CFG::printTable() {
                     if (sizes[iterator] == (*it2).size())
                         spaces += "  ";
                     cout << s + "}" << spaces << "|";
+                    currentElem++;
                 }
             }
-            if (k < this->table.size() - i and (*it2).empty()) {
+            if (currentElem < elem1 and (*it2).empty()) {
                 string spaces;
                 for (int j = 0; j < sizes[iterator] - (*it2).size(); j++) {
                     spaces += "   ";
@@ -297,6 +302,7 @@ void CFG::printTable() {
                 if (sizes[iterator] == (*it2).size())
                     spaces += "  ";
                 cout << s << "}" << spaces << "|";
+                currentElem++;
             }
             iterator++;
 

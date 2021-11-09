@@ -14,13 +14,13 @@ int main() {
     //return 0;
 
     // inlezen uit file
-    CFG cfg("/Users/cedricleclercq/CYK1.json"); // CHange back to input
-    cfg.print();
-    //PDA pda("/Users/cedricleclercq/Documents/1 School/2BINF/Machines en berkenbaarheid/projects/Push-Down-Automaton/PDA1.json");
-    //pda.findState("q");
-    //auto * dd = pda.toCFG();
-    //dd->print();
-    cfg.accepts("baaba");
-    cfg.accepts("abba");
+    //CFG cfg("/Users/cedricleclercq/input.json"); // CHange back to input
+    //cfg.print();
+    PDA pda("/Users/cedricleclercq/Documents/1 School/2BINF/Machines en berkenbaarheid/projects/Push-Down-Automaton/PDA2.json");
+    pda.findState("q");
+    auto * dd = pda.toCFG();
+    dd->print();
+    //cfg.accepts("aaabb");
+    //cfg.accepts("aaabbb");
     return 0;
 }
